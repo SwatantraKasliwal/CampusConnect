@@ -1,0 +1,80 @@
+<%include("partials/header.ejs") %>
+<!-- this is the script to handel the form button so do not mess with it  -->
+<script>
+  function toggleSubEventForm(event) {
+    event.preventDefault(); // Prevent the main form from submitting
+    var subEventForm = document.getElementById("subeventform");
+    if (subEventForm.style.display === "none") {
+      subEventForm.style.display = "block";
+    } else {
+      subEventForm.style.display = "none";
+    }
+  }
+</script>
+<!-- -------------------------------------------------------------------- -->
+<h2>Enter the Event Details</h2>
+  <p>comunity:
+    <%= communityName %>
+  </p>
+<form action="/adminform" method="post">
+  <!-- adding a hidden adminID input so that it will be easy for us to access the admin id and push the data -->
+  <input type="hidden" name="adminId" value="<%= adminId %>" /> 
+  <div>
+    <label for="eventname">Event Name</label>
+    <input type="text" class="form-control" name="eventname" />
+  </div>
+  <div>
+    <label for="eventdetails">Event Details</label>
+    <textarea name="eventdetails" id="event-details">
+Enter the event Detail</textarea
+    >
+  </div>
+  <div>
+    <label for="eventdate">Event Date</label>
+    <input type="date" class="form-control" name="eventdate" />
+  </div>
+  <div>
+    <label for="eventbanner">Event Banner</label>
+    <input type="file" class="form-control" name="eventbanner" />
+  </div>
+  <!-- the sub event button starts here -->
+  <div>
+    <button
+      onclick="toggleSubEventForm(event)"
+      type="button"
+      class="btn btn-secondary"
+    >
+      Add Sub Event+
+    </button>
+  </div>
+  <button type="submit" class="btn btn-dark">Submit Main Form</button>
+  <%  %>
+</form>
+
+<!-- this is the form to the sub event -->
+<div id="subeventform" style="display: none">
+  <h4>Enter the Subevent details</h4>
+  <form action="/subeventform" method="post">
+    <input type="hidden" name="adminId" value="<%= adminId %>" />
+    <div>
+      <label for="subeventname">Sub Event Name</label>
+      <input type="text" class="form-control" name="subeventname" />
+    </div>
+    <div>
+      <label for="subeventdetails">Sub Event Details</label>
+      <textarea name="subeventdetails" class="form-control">
+Enter the sub event details</textarea
+      >
+    </div>
+    <div>
+      <label for="subeventdate">Sub Event Date</label>
+      <input type="date" class="form-control" name="subeventdate" />
+    </div>
+    <div>
+      <label for="subeventbanner">Sub Event Banner</label>
+      <input type="file" class="form-control" name="subeventbanner" />
+    </div>
+    <button type="submit" class="btn btn-dark">Submit Sub Event</button>
+  </form>
+</div>
+<%include("partials/footer.ejs") %>
