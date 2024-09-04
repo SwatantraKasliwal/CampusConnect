@@ -17,40 +17,74 @@ db.connect();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-// Getting home page
 app.get("/", (req, res) => {
-  res.render("index.ejs");
-});
-
-// Admin login page:
-app.get("/adminlogin", (req, res) => {
-  res.render("adminlogin.ejs");
-});
-
-app.post("/adminlogin",async (req, res) => {
-  const userName = req.body.username;
-  const password = req.body.password;
-  const username = await db.query("SELECT * FROM adminlogin WHERE id=$1 AND password=$2",[userName,password]);
-  const data = username.rows;
-  if (data.length > 0){
-    res.render("adminform.ejs",{
-      communityName: userName,
-      adminId:data[0].id
-    });
-  }else{
-    res.send("try again");
+  try{
+    res.render("index.ejs");
+  }catch(err){
+    console.log(err);
+    res.status(500).send("Error rendering home page");
   }
 });
 
-app.post("/subeventform", async(req, res) =>{
- const subEventName = req.body.subeventname;
- const subEventDetails = req.body.subeventdetails;
- const subEventDate = req.body.subeventdate;
- const adminId = req.body.adminId;
- await db.query('INSERT INTO subevent (subevent_name,subevent_details,subevent_date,user_id,event_id) VALUES ($1, $2, $3, $4, 1)',[subEventName, subEventDetails, subEventDate,adminId ]);
- res.send("Sub event added successfully");
+// ---------------------- ADMIN SECTION -----------------------------
+// Getting Admin login page:
+app.get("/adminlogin", (req, res) => {
+  try{
+    res.render("adminlogin.ejs");
+  }catch(err){
+    console.log(err);
+    res.status(500).send("Error rendering admin login page");
+  }
 });
 
+// Checking the admin credentials and directing it to events form
+app.post("/adminlogin",async (req, res) => {
+  try{
+    const {username, password} = req.body;
+    const admin = await db.query("SELECT * FROM adminlogin WHERE admin_id=$1 AND password=$2",[username,password]);
+    const data = admin.rows;
+    // console.log("admin id is " + data[0].id);
+    if (data.length > 0){
+      res.render("adminform.ejs",{
+        communityName: username,
+        adminId: data,
+      });
+    }else{
+      res.send("Please Check the username or password");
+    }
+  }catch(err){
+    console.log(err);
+    res.status(500).send("Error Logging in");
+  }
+  
+});
+
+// adding the data of event into the database
+app.post("/adminform", async(req, res)=>{
+  const {eventname, eventdetails, eventdate, eventtime, eventvenue} = req.body;
+  const adminId = req.body.adminId;
+  try{
+   await db.query("INSERT INTO event (event_name, event_details, event_date,user_id, eventvenue, eventtime) VALUES ($1, $2, $3, $4,$5, $6)", [eventname, eventdetails, eventdate, adminId,eventvenue, eventtime]);
+    res.render("partials/successful.ejs");
+  }catch(err){
+    console.log(err);
+    res.status(500).send("Error adding event");
+  }
+});
+
+// ------------- EVENT SECTION -----------------
+app.get('/events',async (req, res)=>{
+  try{
+    // const data = await db.query("SELECT * FROM event");
+    // const result = data.rows;
+    const data = await db.query("SELECT e.*,a.admin_id from event e join adminlogin a ON a.id = e.user_id;");
+    const result = data.rows
+    res.render("event.ejs",{events:result})
+  }catch(err){
+    console.log(err);
+    res.status(500).send("Error Loading events, Please try again");
+  }
+});
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });

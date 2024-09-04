@@ -1,6 +1,2 @@
--------------------------------Block Diagram ------------------------------------ 
-User Interface --> Student --> Department Module --> Event Module --> Registration
-            |                                                  ^----
-            |                                                       |
-            |                                                       |
-            -----> Admin --> Creating/Updating Event Details --> Database 
+
+

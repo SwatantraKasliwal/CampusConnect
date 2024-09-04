@@ -251,15 +251,3 @@ $(document).ready(function () {
     }
   });
 });
-
-// Creating my personal functions
-
-// function subeventform(event) {
-//   event.preventDefault(); // Prevent the form from submitting
-//   var form = document.getElementById("subeventform");
-//   if (form.style.display === "none") {
-//       form.style.display = "block";
-//   } else {
-//       form.style.display = "none";
-//   }
-// }
