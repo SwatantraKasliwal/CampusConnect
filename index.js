@@ -67,10 +67,14 @@ app.get('/events',async (req, res)=>{
 // Getting Admin login page:
 app.get("/adminlogin", (req, res) => {
   try{
-    res.render("adminlogin.ejs");
+    if(req.isAuthenticated()){
+      res.redirect("/adminevent");
+    }else{
+      res.render("adminlogin.ejs");
+    }
   }catch(err){
-    // console.log(err);
-    res.status(500).send("Error rendering admin login page");
+    console.log(err);
+    res.send("Login Fail try again later");
   }
 });
 
@@ -142,6 +146,7 @@ app.post("/adminform", async(req, res)=>{
 app.post("/delete", async (req, res) =>{
   const deleteEvent = req.body.deleteEventId;
   console.log(deleteEvent);
+  
   try{
     await db.query("DELETE FROM event WHERE event_id = $1",[deleteEvent]);
     res.redirect("/adminevent");

@@ -1,2 +1,40 @@
-
-
+<%- include("partials/adminheader.ejs") %>
+<table>
+  <thead>
+    <tr>
+      <th>Event</th>
+      <th>Details</th>
+      <th>Time</th>
+      <th>Date</th>
+      <th>Venue</th>
+      <th>committees</th>
+    </tr>
+  </thead>
+  <% for(let event of adminEvents){ %>
+  <tbody>
+    <tr>
+      <td>
+        <form
+          action="/delete"
+          method="post"
+          id="deleteForm-<%= event.event_id %>"
+        >
+          <input
+            type="checkbox"
+            name="deleteEventId"
+            value="<%= event.event_id %>"
+            onchange="if(this.checked) { document.getElementById('deleteForm-<%= event.event_id %>').submit(); }"
+          />
+        </form>
+      </td>
+      <td><%=event.event_name%></td>
+      <td><%=event.event_details%></td>
+      <td><%=event.eventtime%></td>
+      <td><%=new Date(event.event_date).toLocaleDateString() %></td>
+      <td><%=event.eventvenue%></td>
+      <td><%= event.admin_id %></td>
+    </tr>
+    <% } %>
+  </tbody>
+</table>
+<%- include("partials/footer.ejs") %>

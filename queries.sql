@@ -19,5 +19,5 @@ CREATE TABLE event(
 	eventvenue VARCHAR(250),
 	eventtime VARCHAR (20) NOT NULL
 );
-INSERT INTO event (event_name, event_details, event_date, user_id) 
-VALUES ('demo2', 'this is demo 2 event', '2024-03-27', 1);
+INSERT INTO event (event_name, event_details, event_date, user_id, eventvenue, eventtime) 
+VALUES ('demo1', 'this is demo 1 event', '2024-03-27', 1, "VPPCOE", "2 pm");
