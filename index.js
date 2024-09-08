@@ -49,6 +49,10 @@ app.get("/", (req, res) => {
   }
 });
 
+app.get("/index", (req, res)=>{
+  res.render("index.ejs");
+});
+
 app.get('/events',async (req, res)=>{
   try{
     const data = await db.query("SELECT e.*,a.admin_id from event e join adminlogin a ON a.id = e.user_id;");
@@ -79,12 +83,22 @@ app.get("/adminform", async (req, res)=>{
   }
 });
 
+app.get("/logout", (req, res)=>{
+    req.logout(function (err) {
+      if (err) {
+        return next(err);
+      }
+      res.redirect("/adminlogin");
+    });
+  });
+
 app.get("/adminevent", async (req, res)=>{
   if (req.isAuthenticated()) {
     console.log(req.user.id); // Getting the admin id from this
     try{
       const data = await db.query("SELECT e.*,a.admin_id from event e join adminlogin a ON a.id = e.user_id WHERE e.user_id = $1;",[req.user.id]);
       const result = data.rows
+      console.log(result);
       res.render("adminevent.ejs",{adminEvents:result})
     }catch(err){
       // console.log(err);
@@ -122,6 +136,17 @@ app.post("/adminform", async(req, res)=>{
      }
   }else{
     res.render("adminlogin.ejs");
+  }
+});
+
+app.post("/delete", async (req, res) =>{
+  const deleteEvent = req.body.deleteEventId;
+  console.log(deleteEvent);
+  try{
+    await db.query("DELETE FROM event WHERE event_id = $1",[deleteEvent]);
+    res.redirect("/adminevent");
+  }catch(err){
+    console.log(err);
   }
 });
 
