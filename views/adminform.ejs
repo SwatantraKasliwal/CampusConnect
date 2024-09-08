@@ -1,7 +1,6 @@
-<%-include("partials/header.ejs") %>
+<%-include("partials/adminheader.ejs") %>
 
 <h2>Enter the Event Details</h2>
-<p>community: <%= communityName %></p>
 <form action="/adminform" method="post">
   <!-- adding a hidden adminID input so that it will be easy for us to access the admin id and push the data -->
   <input type="hidden" name="adminId" value="<%= adminId[0].id %>" />

@@ -1,17 +1,40 @@
 import express from "express";
 import bodyParser from "body-parser";
 import pg from "pg";
+import bcrypt from "bcrypt";
+import passport from "passport";
+import { Strategy } from "passport-local";
+import GoogleStrategy from "passport-google-oauth2";
+import session from "express-session";
+import env from "dotenv";
 
+// Middleware and constants
 const app = express();
 const port = 3000;
+const saltRounds = 10;
+env.config();
+
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+      maxAge: 24 * 60 * 60 * 1000 // 1 day in milliseconds
+  },
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 const db = new pg.Client({
-  user: "postgres",
-  host: "localhost",
-  database: "campusConnect",
-  password: "Swatantra@25",
-  port: 5433,
+  user: process.env.PG_USER,
+  host: process.env.PG_HOST,
+  database: process.env.PG_DATABASE,
+  password: process.env.PG_PASSWORD,
+  port: process.env.PG_PORT,
 });
+
 db.connect();
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -26,65 +49,113 @@ app.get("/", (req, res) => {
   }
 });
 
-// ---------------------- ADMIN SECTION -----------------------------
+app.get('/events',async (req, res)=>{
+  try{
+    const data = await db.query("SELECT e.*,a.admin_id from event e join adminlogin a ON a.id = e.user_id;");
+    const result = data.rows
+    res.render("event.ejs",{events:result})
+  }catch(err){
+    // console.log(err);
+    res.status(500).send("Error Loading events, Please try again");
+  }
+});
+
 // Getting Admin login page:
 app.get("/adminlogin", (req, res) => {
   try{
     res.render("adminlogin.ejs");
   }catch(err){
-    console.log(err);
+    // console.log(err);
     res.status(500).send("Error rendering admin login page");
   }
 });
 
-// Checking the admin credentials and directing it to events form
-app.post("/adminlogin",async (req, res) => {
+app.get("/adminform", async (req, res)=>{
+  if (req.isAuthenticated()) {
+    console.log(req.user.admin_id); // Getting the admin id from this
+    res.render("adminform.ejs",{adminId:req.user.admin_id});
+  }else{
+    res.render("adminlogin.ejs");
+  }
+});
+
+app.get("/adminevent", async (req, res)=>{
+  if (req.isAuthenticated()) {
+    console.log(req.user.id); // Getting the admin id from this
+    try{
+      const data = await db.query("SELECT e.*,a.admin_id from event e join adminlogin a ON a.id = e.user_id WHERE e.user_id = $1;",[req.user.id]);
+      const result = data.rows
+      res.render("adminevent.ejs",{adminEvents:result})
+    }catch(err){
+      // console.log(err);
+      res.status(500).send("Error Loading events, Please try again");
+    }
+  }else{
+    res.render("adminlogin.ejs");
+  }
+});
+
+app.post("/adminlogin", (req, res, next) => {
+  passport.authenticate("local", (err, user, info) => {
+    console.log(user.admin_id);
+    if (err) { return next(err); }
+    if (!user) { return res.redirect("/adminlogin"); }
+    req.logIn(user, (err) => {
+      if (err) { return next(err); }
+      console.log(req.user); // Log the authenticated user
+      return res.redirect("/adminevent");
+    });
+  })(req, res, next);
+});
+
+app.post("/adminform", async(req, res)=>{
+  if (req.isAuthenticated()) {
+    console.log(req.user.admin_id); // Getting the admin id from this
+    const {eventname, eventdetails, eventdate, eventtime, eventvenue} = req.body;
+    const adminId = req.user.id;
+    try{
+      await db.query("INSERT INTO event (event_name, event_details, event_date,user_id, eventvenue, eventtime) VALUES ($1, $2, $3, $4,$5, $6)", [eventname, eventdetails, eventdate, adminId,eventvenue, eventtime]);
+       res.render("partials/successful.ejs");
+     }catch(err){
+       console.log(err);
+       res.status(500).send("Error adding event");
+     }
+  }else{
+    res.render("adminlogin.ejs");
+  }
+});
+
+// creating the strategies 
+passport.use("local", new Strategy(async function verify(username, password, cb){
+  console.log(username, password);
   try{
-    const {username, password} = req.body;
-    const admin = await db.query("SELECT * FROM adminlogin WHERE admin_id=$1 AND password=$2",[username,password]);
-    const data = admin.rows;
-    // console.log("admin id is " + data[0].id);
-    if (data.length > 0){
-      res.render("adminform.ejs",{
-        communityName: username,
-        adminId: data,
-      });
+    const result = await db.query("SELECT * FROM adminlogin WHERE admin_id=$1",[username]);
+    if(result.rows.length>0){
+      const admin = result.rows[0];
+      const storedPassword = admin.password;
+      if (password === storedPassword){
+        return cb(null,admin);
+      }
     }else{
-      res.send("Please Check the username or password");
+      return cb("Please Check the username or password");
     }
   }catch(err){
-    console.log(err);
-    res.status(500).send("Error Logging in");
+   return cb(err)
   }
-  
+}));
+
+passport.serializeUser((admin, cb) => {
+  cb(null, admin.admin_id);
 });
 
-// adding the data of event into the database
-app.post("/adminform", async(req, res)=>{
-  const {eventname, eventdetails, eventdate, eventtime, eventvenue} = req.body;
-  const adminId = req.body.adminId;
-  try{
-   await db.query("INSERT INTO event (event_name, event_details, event_date,user_id, eventvenue, eventtime) VALUES ($1, $2, $3, $4,$5, $6)", [eventname, eventdetails, eventdate, adminId,eventvenue, eventtime]);
-    res.render("partials/successful.ejs");
-  }catch(err){
-    console.log(err);
-    res.status(500).send("Error adding event");
-  }
+passport.deserializeUser((id, cb) => {
+  db.query("SELECT * FROM adminlogin WHERE admin_id=$1", [id], (err, result) => {
+    if (err) { return cb(err); }
+    cb(null, result.rows[0]);
+  });
 });
 
-// ------------- EVENT SECTION -----------------
-app.get('/events',async (req, res)=>{
-  try{
-    // const data = await db.query("SELECT * FROM event");
-    // const result = data.rows;
-    const data = await db.query("SELECT e.*,a.admin_id from event e join adminlogin a ON a.id = e.user_id;");
-    const result = data.rows
-    res.render("event.ejs",{events:result})
-  }catch(err){
-    console.log(err);
-    res.status(500).send("Error Loading events, Please try again");
-  }
-});
+
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });
