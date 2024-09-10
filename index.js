@@ -157,7 +157,7 @@ app.post("/adminform", async(req, res)=>{
     const adminId = req.user.id;
     const eventBanner = req.files.eventbanner;
     try{
-      await db.query("INSERT INTO event (event_name, event_details, event_date,user_id, eventvenue, eventtime, event_url, event_banner, banner_data) VALUES ($1, $2, $3, $4,$5, $6, $7, $8, $9)", [eventname, eventdetails, eventdate, adminId,eventvenue, eventtime, eventurl, eventBanner.name, eventBanner.data]);
+      await db.query("INSERT INTO event (event_name, event_details, event_date,user_id, event_venue, event_time, event_url, event_banner, banner_data) VALUES ($1, $2, $3, $4,$5, $6, $7, $8, $9)", [eventname, eventdetails, eventdate, adminId,eventvenue, eventtime, eventurl, eventBanner.name, eventBanner.data]);
        res.render("partials/successful.ejs");
      }catch(err){
        console.log(err);

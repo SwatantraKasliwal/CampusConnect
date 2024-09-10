@@ -17,9 +17,9 @@
       <tr>
         <td><%=event.event_name%></td>
         <td><%=event.event_details%></td>
-        <td><%=event.eventtime%></td>
+        <td><%=event.event_time%></td>
         <td><%=new Date(event.event_date).toLocaleDateString() %></td>
-        <td><%=event.eventvenue%></td>
+        <td><%=event.event_venue%></td>
         <td><%= event.admin_id %></td>
         <td><a href="<%= event.event_url %>">Registration Link</a></td>
         <td>
