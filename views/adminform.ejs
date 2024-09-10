@@ -1,12 +1,12 @@
 <%-include("partials/adminheader.ejs") %>
 
 <h2>Enter the Event Details</h2>
-<form action="/adminform" method="post">
+<form action="/adminform" method="post" enctype="multipart/form-data">
   <!-- adding a hidden adminID input so that it will be easy for us to access the admin id and push the data -->
   <input type="hidden" name="adminId" value="<%= adminId[0].id %>" />
   <div>
     <label for="eventname">Event Name</label>
-    <input type="text" class="form-control" name="eventname" />
+    <input type="text"  name="eventname" />
   </div>
   <div>
     <label for="eventdetails">Event Details</label>
@@ -16,11 +16,11 @@ Enter the event Detail</textarea
   </div>
   <div>
     <label for="eventdate">Event Date</label>
-    <input type="date" class="form-control" name="eventdate" />
+    <input type="date"  name="eventdate" />
   </div>
   <div>
     <label for="eventtime">Event Time</label>
-    <input type="text" class="form-control" name="eventtime" />
+    <input type="text"  name="eventtime" />
   </div>
   <div>
     <label for="eventvenue">Event Venue</label>
@@ -28,7 +28,11 @@ Enter the event Detail</textarea
   </div>
   <div>
     <label for="eventbanner">Event Banner</label>
-    <input type="file" class="form-control" name="eventbanner" />
+    <input type="file"  name="eventbanner" />
+  </div>
+  <div>
+    <label for="eventurl">Url</label>
+    <input type="url" name="eventurl">
   </div>
   <button type="submit" class="btn btn-dark">Submit</button>
 </form>

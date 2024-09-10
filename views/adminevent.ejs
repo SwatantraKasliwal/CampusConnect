@@ -21,6 +21,8 @@
       <th>Date</th>
       <th>Venue</th>
       <th>Committees</th>
+      <th>Registration Link</th>
+      <th>Event Banner</th>
     </tr>
   </thead>
   <tbody>
@@ -37,6 +39,10 @@
       <td><%=new Date(event.event_date).toLocaleDateString() %></td>
       <td><%=event.eventvenue%></td>
       <td><%= event.admin_id %></td>
+      <td><a href="<%= event.event_url %>">Registration Link</a></td>
+      <td>
+        <img src="/images/<%= event.event_banner %>" alt="Event Banner" style="width: 100px; height: 100px;">
+      </td>
     </tr>
     <% } %>
   </tbody>

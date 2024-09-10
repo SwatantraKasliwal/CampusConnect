@@ -7,6 +7,7 @@ import { Strategy } from "passport-local";
 import GoogleStrategy from "passport-google-oauth2";
 import session from "express-session";
 import env from "dotenv";
+import fileUpload from "express-fileupload";
 
 // Middleware and constants
 const app = express();
@@ -39,7 +40,9 @@ db.connect();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
+app.use(fileUpload());
 
+// Get routes
 app.get("/", (req, res) => {
   try{
     res.render("index.ejs");
@@ -64,7 +67,6 @@ app.get('/events',async (req, res)=>{
   }
 });
 
-// Getting Admin login page:
 app.get("/adminlogin", (req, res) => {
   try{
     if(req.isAuthenticated()){
@@ -113,6 +115,28 @@ app.get("/adminevent", async (req, res)=>{
   }
 });
 
+//  Getting the image data
+app.get('/images/:imageName', async (req, res) => {
+    try {
+      const imageName = req.params.imageName;
+      const data = await db.query("SELECT banner_data FROM event WHERE event_banner = $1", [imageName]);
+      if (data.rows.length > 0) {
+        const img = data.rows[0].banner_data;
+        res.writeHead(200, {
+          'Content-Type': 'image/jpeg',
+          'Content-Length': img.length
+        });
+        res.end(img);
+      } else {
+        res.status(404).send('Image not found');
+      }
+    } catch (err) {
+      res.status(500).send('Error retrieving image');
+    }
+});
+
+
+//  Post Routes
 app.post("/adminlogin", (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
     console.log(user.admin_id);
@@ -129,10 +153,11 @@ app.post("/adminlogin", (req, res, next) => {
 app.post("/adminform", async(req, res)=>{
   if (req.isAuthenticated()) {
     console.log(req.user.admin_id); // Getting the admin id from this
-    const {eventname, eventdetails, eventdate, eventtime, eventvenue} = req.body;
+    const {eventname, eventdetails, eventdate, eventtime, eventvenue,eventurl} = req.body;
     const adminId = req.user.id;
+    const eventBanner = req.files.eventbanner;
     try{
-      await db.query("INSERT INTO event (event_name, event_details, event_date,user_id, eventvenue, eventtime) VALUES ($1, $2, $3, $4,$5, $6)", [eventname, eventdetails, eventdate, adminId,eventvenue, eventtime]);
+      await db.query("INSERT INTO event (event_name, event_details, event_date,user_id, eventvenue, eventtime, event_url, event_banner, banner_data) VALUES ($1, $2, $3, $4,$5, $6, $7, $8, $9)", [eventname, eventdetails, eventdate, adminId,eventvenue, eventtime, eventurl, eventBanner.name, eventBanner.data]);
        res.render("partials/successful.ejs");
      }catch(err){
        console.log(err);

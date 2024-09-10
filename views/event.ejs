@@ -1,27 +1,32 @@
 <%- include("partials/header.ejs") %>
-<table><thead>
-    <tr>
+<table>
+    <thead>
+      <tr>
         <th>Event</th>
         <th>Details</th>
         <th>Time</th>
         <th>Date</th>
         <th>Venue</th>
-        <th>committees</th>
-    </tr>
-</thead>
-        <% for(let event of events){ %>
-        <tbody>
-            <tr>
-                <td><%=event.event_name%></td>
-                <td><%=event.event_details%></td>
-                <td><%=event.eventtime%></td>
-                <td><%=new Date(event.event_date).toLocaleDateString() %></td>
-                <td><%=event.eventvenue%></td>
-                <td><%= event.admin_id %></td>
-            </tr>
-            <% } %>
-        </tbody>
-    </table>
-
-    <a href="/logout" role="button">Logout</a>
+        <th>Committees</th>
+        <th>Registration Link</th>
+        <th>Event Banner</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% for(let event of events){ %>
+      <tr>
+        <td><%=event.event_name%></td>
+        <td><%=event.event_details%></td>
+        <td><%=event.eventtime%></td>
+        <td><%=new Date(event.event_date).toLocaleDateString() %></td>
+        <td><%=event.eventvenue%></td>
+        <td><%= event.admin_id %></td>
+        <td><a href="<%= event.event_url %>">Registration Link</a></td>
+        <td>
+          <img src="/images/<%= event.event_banner %>" alt="Event Banner" style="width: 100px; height: 100px;">
+        </td>
+      </tr>
+      <% } %>
+    </tbody>
+  </table>
 <%- include("partials/footer.ejs") %>
