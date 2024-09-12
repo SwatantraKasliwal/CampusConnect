@@ -1,4 +1,4 @@
-<%- include("partials/header.ejs") %>
+<%- include("partials/studentheader.ejs") %>
 <table>
     <thead>
       <tr>
@@ -8,11 +8,12 @@
         <th>Date</th>
         <th>Venue</th>
         <th>Committees</th>
+        <th>Registration Link</th>
         <th>Event Banner</th>
       </tr>
     </thead>
     <tbody>
-      <% for(let event of events){ %>
+      <% for(let event of studentEvents){ %>
       <tr>
         <td><%=event.event_name%></td>
         <td><%=event.event_details%></td>
@@ -20,6 +21,7 @@
         <td><%=new Date(event.event_date).toLocaleDateString() %></td>
         <td><%=event.event_venue%></td>
         <td><%= event.admin_id %></td>
+        <td><a href="<%=event.event_url %>">Registration Link</a></td>
         <td>
           <img src="/images/<%= event.event_banner %>" alt="Event Banner" style="width: 100px; height: 100px;">
         </td>
@@ -27,8 +29,4 @@
       <% } %>
     </tbody>
   </table>
-
-  <script>
-    alert("To join the event please register or login");
-  </script>
 <%- include("partials/footer.ejs") %>

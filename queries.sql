@@ -24,3 +24,10 @@ CREATE TABLE event(
 );
 INSERT INTO event (event_name, event_details, event_date, user_id, eventvenue, eventtime) 
 VALUES ('demo1', 'this is demo 1 event', '2024-03-27', 1, "VPPCOE", "2 pm");
+
+-- Student table 
+CREATE TABLE studentlogin(
+	id serial primary key,
+	s_email varchar(70) not null ,
+	s_password text not null
+);

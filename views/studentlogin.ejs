@@ -1,0 +1,45 @@
+<%-include("partials/studentheader.ejs") %>
+
+<div class="login">
+    <h2>Login</h2>
+    <form action="/studentlogin" method="post"> 
+        <div class="form-group">
+            <label for="username">email</label>
+            <input type="email" class="form-control" name="username">
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" name="password">
+        </div>
+        <button type="submit" class="btn btn-dark">Login</button>
+    </form>
+    <div class="card-body">
+        <a class="btn btn-block" href="/auth/google" role="button">
+            Login with Google
+        </a>
+    </div>
+</div>
+
+<div class="register">
+    <h2>Register</h2>
+    <form action="/registerstudent" method="post"> 
+        <div class="form-group">
+            <label for="username">email</label>
+            <input type="email" class="form-control" name="username">
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" name="password">
+        </div>
+        <button type="submit" class="btn btn-dark">Register</button>
+    </form>
+    <div class="card-body">
+        <a class="btn btn-block" href="/auth/google" role="button">
+            SignUp with Google
+        </a>
+    </div>
+</div>
+    
+
+
+<%-include("partials/footer.ejs") %>

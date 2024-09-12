@@ -94,7 +94,7 @@ app.get("/logout", (req, res)=>{
       if (err) {
         return next(err);
       }
-      res.redirect("/adminlogin");
+      res.redirect("/index");
     });
   });
 
@@ -135,6 +135,46 @@ app.get('/images/:imageName', async (req, res) => {
     }
 });
 
+app.get("/studentlogin", (req, res)=>{
+  try{
+    if(req.isAuthenticated()){
+      res.redirect("/studentevent");
+    }else{
+      res.render("studentlogin.ejs");
+    }
+  }catch(err){
+    console.log(err);
+    res.send("Login Fail try again later");
+  }
+});
+
+app.get("/studentevent", async(req, res) =>{
+  if (req.isAuthenticated()) {
+    console.log(req.user.id); // Getting the student id from this
+    try{
+      const data = await db.query("SELECT e.*,a.admin_id from event e join adminlogin a ON a.id = e.user_id ");
+      const result = data.rows
+      console.log(result);
+      res.render("studentevent.ejs",{studentEvents:result})
+    }catch(err){
+      // console.log(err);
+      res.status(500).send("Error Loading events, Please try again");
+    }
+  }else{
+    res.render("adminlogin.ejs");
+  }
+});
+
+app.get("/auth/google", passport.authenticate("google", {
+  scope: ["profile", "email"],
+}));
+
+app.get("/auth/google/callback", passport.authenticate("google", {
+  successRedirect:"/studentevent",
+  failureRedirect: "/studentlogin",
+}
+));
+
 
 //  Post Routes
 app.post("/adminlogin", (req, res, next) => {
@@ -148,6 +188,52 @@ app.post("/adminlogin", (req, res, next) => {
       return res.redirect("/adminevent");
     });
   })(req, res, next);
+});
+
+app.post("/studentlogin", (req, res, next) =>{
+  passport.authenticate("student-local", (err, user, info) =>{
+    console.log(user.s_email);
+    if(err){return next(err);}
+    if(!user){return res.redirect("/studentlogin");}
+    req.logIn(user, (err)=>{
+      if(err){return next(err);}
+      console.log(req.user); //Login the authenticated student
+      return res.redirect("/studentevent");
+    })
+  })(req, res, next);
+});
+
+app.post("/registerstudent", async (req, res)=>{
+  const s_email = req.body.username;
+  const s_password = req.body.password;
+
+  try {
+    const checkResult = await db.query("SELECT * FROM studentlogin WHERE s_email = $1", [
+      s_email,
+    ]);
+
+    if (checkResult.rows.length > 0) {
+      res.redirect("/studentlogin");
+    } else {
+      bcrypt.hash(s_password, saltRounds, async (err, hash) => {
+        if (err) {
+          console.error("Error hashing password:", err);
+        } else {
+          const result = await db.query(
+            "INSERT INTO studentlogin (s_email, s_password) VALUES ($1, $2) RETURNING *",
+            [s_email, hash]
+          );
+          const user = result.rows[0];
+          req.login(user, (err) => {
+            console.log("success");
+            res.redirect("/studentevent");
+          });
+        }
+      });
+    }
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 app.post("/adminform", async(req, res)=>{
@@ -181,7 +267,8 @@ app.post("/delete", async (req, res) =>{
 });
 
 // creating the strategies 
-passport.use("local", new Strategy(async function verify(username, password, cb){
+passport.use("local", new Strategy(
+  async function verify(username, password, cb){
   console.log(username, password);
   try{
     const result = await db.query("SELECT * FROM adminlogin WHERE admin_id=$1",[username]);
@@ -199,15 +286,83 @@ passport.use("local", new Strategy(async function verify(username, password, cb)
   }
 }));
 
-passport.serializeUser((admin, cb) => {
-  cb(null, admin.admin_id);
+passport.use("student-local", new Strategy(
+  async function verify (username, password, cb){
+    console.log(username,password)
+    try {
+      const result = await db.query("SELECT * FROM studentlogin WHERE s_email=$1", [username]);
+      if (result.rows.length > 0) {
+        const student = result.rows[0];
+        const storedPassword = student.s_password;
+        bcrypt.compare(password, storedPassword, (err, valid) => {
+          if (err) {
+          //Error with password check
+          console.error("Error comparing passwords:", err);
+          return cb(err);
+        } else {
+          if (valid) {
+            //Passed password check
+            return cb(null, student);
+          } else {
+            //Did not pass password check
+            return cb(null, false);
+          }
+        }
+      });
+    } else {
+      return cb(res.redirect("/studentlogin"),"User not found");
+
+    }
+  } catch (err) {
+    console.log(err);
+  }
+}
+));
+
+passport.use("google",
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: "http://localhost:3000/auth/google/callback",
+      userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
+    },
+    async (accessToken, refreshToken, profile, cb) => {
+      console.log(profile);
+      try{
+        const result = await db.query("SELECT * FROM studentlogin WHERE s_email = $1", [profile.email]);
+        if (result.rows.length === 0){
+          const newUser = await db.query("INSERT INTO studentlogin (s_email,s_password) VALUES ($1,$2)", [profile.email, "google"])
+          const student = newUser.rows[0];
+          cb (null, student);
+        }else{
+          cb(null,result.rows[0]);
+        }
+      }catch(err){
+        cb(err);
+      }
+    }
+  )
+);
+
+passport.serializeUser((user, cb) => {
+  cb(null, { id: user.admin_id || user.s_email, type: user.admin_id ? 'admin' : 'student' });
 });
 
-passport.deserializeUser((id, cb) => {
-  db.query("SELECT * FROM adminlogin WHERE admin_id=$1", [id], (err, result) => {
-    if (err) { return cb(err); }
-    cb(null, result.rows[0]);
-  });
+passport.deserializeUser((obj, cb) => {
+  if (obj.type === 'admin') {
+    db.query("SELECT * FROM adminlogin WHERE admin_id=$1", [obj.id], (err, result) => {
+      if (err) { return cb(err); }
+      cb(null, result.rows[0]);
+    });
+  } else {
+    console.log(obj);
+    console.log(obj.id);
+    db.query("SELECT * FROM studentlogin WHERE s_email=$1", [obj.id], (err, result) => {
+      if (err) { return cb(err); }
+      cb(null, result.rows[0]);
+    });
+  }
 });
 
 
