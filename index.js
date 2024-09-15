@@ -8,6 +8,7 @@ import GoogleStrategy from "passport-google-oauth2";
 import session from "express-session";
 import env from "dotenv";
 import fileUpload from "express-fileupload";
+import nodemailer from "nodemailer";
 
 // Middleware and constants
 const app = express();
@@ -42,7 +43,41 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.use(fileUpload());
 
-// Get routes
+// ---------- Email Service ----------
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD,
+  },
+  logger: true, // Enable logging
+  debug: true,  // Include SMTP traffic in the logs
+});
+
+// Send email to all users
+async function sendEmailsToUsers(eventDetails) {
+  try {
+    // Fetch all students' emails
+    const result = await db.query("SELECT s_email FROM studentlogin");
+    const emails = result.rows.map(row => row.s_email);
+
+    // Create the email options
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: emails.join(','), // Sending to all students
+      subject: `New Event Added: ${eventDetails.eventname}`,
+      text: `Hi there, a new event "${eventDetails.eventname}" has been added.\nDetails: ${eventDetails.eventdetails}\nDate: ${eventDetails.eventdate}\nTime: ${eventDetails.eventtime}\nVenue: ${eventDetails.eventvenue}\nURL: ${eventDetails.eventurl}`,
+    };
+
+    // Send email
+    await transporter.sendMail(mailOptions);
+    console.log('Emails sent successfully');
+  } catch (error) {
+    console.log('Error sending emails:', error);
+  }
+}
+
+// ---------- Get Routes ----------
 app.get("/", (req, res) => {
   try{
     res.render("index.ejs");
@@ -175,8 +210,7 @@ app.get("/auth/google/callback", passport.authenticate("google", {
 }
 ));
 
-
-//  Post Routes
+// ---------- Post Routes ----------
 app.post("/adminlogin", (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
     console.log(user.admin_id);
@@ -244,6 +278,9 @@ app.post("/adminform", async(req, res)=>{
     const eventBanner = req.files.eventbanner;
     try{
       await db.query("INSERT INTO event (event_name, event_details, event_date,user_id, event_venue, event_time, event_url, event_banner, banner_data) VALUES ($1, $2, $3, $4,$5, $6, $7, $8, $9)", [eventname, eventdetails, eventdate, adminId,eventvenue, eventtime, eventurl, eventBanner.name, eventBanner.data]);
+
+      // Sending email to users 
+      await sendEmailsToUsers({ eventname, eventdetails, eventdate, eventtime, eventvenue, eventurl });
        res.render("partials/successful.ejs");
      }catch(err){
        console.log(err);
