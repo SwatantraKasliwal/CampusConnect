@@ -91,14 +91,58 @@ app.get("/index", (req, res)=>{
   res.render("index.ejs");
 });
 
+app.get("/adminHome", (req, res)=>{
+  res.render("adminHome.ejs");
+});
+
+app.get("/studentHome", (req, res) =>{
+  res.render("studentHome.ejs")
+});
+
+// Events section 
 app.get('/events',async (req, res)=>{
   try{
-    const data = await db.query("SELECT e.*,a.admin_id from event e join adminlogin a ON a.id = e.user_id;");
+    // const data = await db.query("SELECT e.*,a.admin_id from event e join adminlogin a ON a.id = e.user_id;");
+    const data = await db.query("SELECT e.*, a.admin_id FROM event e JOIN adminlogin a ON a.id = e.user_id ORDER BY e.event_id DESC;");
     const result = data.rows
     res.render("event.ejs",{events:result})
   }catch(err){
     // console.log(err);
     res.status(500).send("Error Loading events, Please try again");
+  }
+});
+
+app.get("/adminevent", async (req, res)=>{
+  if (req.isAuthenticated()) {
+    console.log(req.user.id); // Getting the admin id from this
+    try{
+      const data = await db.query("SELECT e.*,a.admin_id from event e join adminlogin a ON a.id = e.user_id WHERE e.user_id = $1 ORDER BY e.event_id DESC;",[req.user.id]);
+      const result = data.rows
+      console.log(result);
+      res.render("adminevent.ejs",{adminEvents:result})
+    }catch(err){
+      // console.log(err);
+      res.status(500).send("Error Loading events, Please try again");
+    }
+  }else{
+    res.render("adminlogin.ejs");
+  }
+});
+
+app.get("/studentevent", async(req, res) =>{
+  if (req.isAuthenticated()) {
+    console.log(req.user.id); // Getting the student id from this
+    try{
+      const data = await db.query("SELECT e.*,a.admin_id from event e join adminlogin a ON a.id = e.user_id ORDER BY e.event_id DESC");
+      const result = data.rows
+      console.log(result);
+      res.render("studentevent.ejs",{studentEvents:result})
+    }catch(err){
+      // console.log(err);
+      res.status(500).send("Error Loading events, Please try again");
+    }
+  }else{
+    res.render("adminlogin.ejs");
   }
 });
 
@@ -133,22 +177,6 @@ app.get("/logout", (req, res)=>{
     });
   });
 
-app.get("/adminevent", async (req, res)=>{
-  if (req.isAuthenticated()) {
-    console.log(req.user.id); // Getting the admin id from this
-    try{
-      const data = await db.query("SELECT e.*,a.admin_id from event e join adminlogin a ON a.id = e.user_id WHERE e.user_id = $1;",[req.user.id]);
-      const result = data.rows
-      console.log(result);
-      res.render("adminevent.ejs",{adminEvents:result})
-    }catch(err){
-      // console.log(err);
-      res.status(500).send("Error Loading events, Please try again");
-    }
-  }else{
-    res.render("adminlogin.ejs");
-  }
-});
 
 //  Getting the image data
 app.get('/images/:imageName', async (req, res) => {
@@ -180,23 +208,6 @@ app.get("/studentlogin", (req, res)=>{
   }catch(err){
     console.log(err);
     res.send("Login Fail try again later");
-  }
-});
-
-app.get("/studentevent", async(req, res) =>{
-  if (req.isAuthenticated()) {
-    console.log(req.user.id); // Getting the student id from this
-    try{
-      const data = await db.query("SELECT e.*,a.admin_id from event e join adminlogin a ON a.id = e.user_id ");
-      const result = data.rows
-      console.log(result);
-      res.render("studentevent.ejs",{studentEvents:result})
-    }catch(err){
-      // console.log(err);
-      res.status(500).send("Error Loading events, Please try again");
-    }
-  }else{
-    res.render("adminlogin.ejs");
   }
 });
 
