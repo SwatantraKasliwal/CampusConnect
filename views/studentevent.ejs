@@ -10,6 +10,7 @@
         <th>Committees</th>
         <th>Registration Link</th>
         <th>Event Banner</th>
+        <th>Status</th>
       </tr>
     </thead>
     <tbody>
@@ -21,10 +22,23 @@
         <td><%=new Date(event.event_date).toLocaleDateString() %></td>
         <td><%=event.event_venue%></td>
         <td><%= event.admin_id %></td>
-        <td><a href="<%=event.event_url %>">Registration Link</a></td>
+        <td>
+        <% if (new Date().toLocaleDateString() === new Date(event.event_date).toLocaleDateString() || new Date() > new Date(event.event_date)) { %>
+          <a href="#" class="registration-link">Registration Closed</a>
+        <% } else { %>
+          <a href="<%= event.event_url %>">Registration Link</a>
+        <% } %>
+      </td>
         <td>
           <img src="/images/<%= event.event_banner %>" alt="Event Banner" style="width: 100px; height: 100px;">
         </td>
+        <% if (new Date().toLocaleDateString() === new Date(event.event_date).toLocaleDateString()){%>
+          <td>the event is today</td>
+            <% }else if(new Date() < new Date(event.event_date)){ %>
+              <td>The upcoming</td>
+              <% }else{ %>
+                <td>The event is ended</td>
+                <% } %>
       </tr>
       <% } %>
     </tbody>

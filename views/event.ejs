@@ -9,6 +9,7 @@
         <th>Venue</th>
         <th>Committees</th>
         <th>Event Banner</th>
+        <th>Status</th>
       </tr>
     </thead>
     <tbody>
@@ -23,6 +24,13 @@
         <td>
           <img src="/images/<%= event.event_banner %>" alt="Event Banner" style="width: 100px; height: 100px;">
         </td>
+        <% if (new Date().toLocaleDateString() === new Date(event.event_date).toLocaleDateString()){%>
+        <td>the event is today</td>
+          <% }else if(new Date() < new Date(event.event_date)){ %>
+            <td>The upcoming</td>
+            <% }else{ %>
+              <td>The event is ended</td>
+              <% } %>
       </tr>
       <% } %>
     </tbody>

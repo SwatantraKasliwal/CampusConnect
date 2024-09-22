@@ -1798,3 +1798,4 @@ header {
   width: 100%;
   z-index: 999;
 }
+/* To make frontend event section , student event section, admin event section use the header.ejs, studentheader.ejs , adminHeader.ejs resp to style them individually and use style tag  */
