@@ -1,42 +1,34 @@
-<%- include("partials/header.ejs") %>
-<table>
-    <thead>
-      <tr>
-        <th>Event</th>
-        <th>Details</th>
-        <th>Time</th>
-        <th>Date</th>
-        <th>Venue</th>
-        <th>Committees</th>
-        <th>Event Banner</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% for(let event of events){ %>
-      <tr>
-        <td><%=event.event_name%></td>
-        <td><%=event.event_details%></td>
-        <td><%=event.event_time%></td>
-        <td><%=new Date(event.event_date).toLocaleDateString() %></td>
-        <td><%=event.event_venue%></td>
-        <td><%= event.admin_id %></td>
-        <td>
-          <img src="/images/<%= event.event_banner %>" alt="Event Banner" style="width: 100px; height: 100px;">
-        </td>
-        <% if (new Date().toLocaleDateString() === new Date(event.event_date).toLocaleDateString()){%>
-        <td>the event is today</td>
-          <% }else if(new Date() < new Date(event.event_date)){ %>
-            <td>The upcoming</td>
-            <% }else{ %>
-              <td>The event is ended</td>
-              <% } %>
-      </tr>
-      <% } %>
-    </tbody>
-  </table>
+<%- include("partials/header.ejs") %> <% for(let event of events){ %>
 
-  <script>
-    alert("To join the event please register or login");
-  </script>
+<article class="postcard light blue">
+    <img
+      class="postcard__img"
+      src="/images/<%= event.event_banner %>"
+      alt="Image Title"
+    />
+  <div class="postcard__text t-dark">
+    <h1 class="postcard__title blue"><%=event.event_name%></h1>
+    <div class="postcard__subtitle small">
+      <time>
+        <i class="fas fa-calendar-alt mr-2"></i><%=new
+        Date(event.event_date).toLocaleDateString() %>,<%=event.event_time%>
+      </time>
+    </div>
+    <div class="postcard__bar"></div>
+    <div class="postcard__preview-txt"><%=event.event_details%></div>
+    <ul class="postcard__tagbox">
+      <i class="tag__item fas fa-clock mr-2"></i
+      >Venue: <%=event.event_venue%>
+    </ul>
+    <ul class="postcard__tagbox">
+      <i class="tag__item fas fa-clock mr-2"></i
+      ><%= event.admin_id %>
+    </ul>
+  </div>
+</article>
+<% } %>
+
+<script>
+  alert("To join the event please register or login");
+</script>
 <%- include("partials/footer.ejs") %>

@@ -1,46 +1,54 @@
 <%- include("partials/studentheader.ejs") %>
-<table>
-    <thead>
-      <tr>
-        <th>Event</th>
-        <th>Details</th>
-        <th>Time</th>
-        <th>Date</th>
-        <th>Venue</th>
-        <th>Committees</th>
-        <th>Registration Link</th>
-        <th>Event Banner</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% for(let event of studentEvents){ %>
-      <tr>
-        <td><%=event.event_name%></td>
-        <td><%=event.event_details%></td>
-        <td><%=event.event_time%></td>
-        <td><%=new Date(event.event_date).toLocaleDateString() %></td>
-        <td><%=event.event_venue%></td>
-        <td><%= event.admin_id %></td>
-        <td>
-        <% if (new Date().toLocaleDateString() === new Date(event.event_date).toLocaleDateString() || new Date() > new Date(event.event_date)) { %>
-          <a href="#" class="registration-link">Registration Closed</a>
+
+<% for(let event of studentEvents) { %>
+  <article class="postcard light blue">
+    <img
+      class="postcard__img"
+      src="/images/<%= event.event_banner %>"
+      alt="Image Title"
+    />
+    <div class="postcard__text t-dark">
+      <h1 class="postcard__title blue"><a href="#"><%= event.event_name %></a></h1>
+      <div class="postcard__subtitle small">
+        <time>
+          <i class="fas fa-calendar-alt mr-2"></i><%= new Date(event.event_date).toLocaleDateString() %>, <%= event.event_time %>
+        </time>
+      </div>
+      <div class="postcard__bar"></div>
+      <div class="postcard__preview-txt"><%= event.event_details %></div>
+      <ul class="postcard__tagbox">
+          <i class="tag__item fas fa-clock mr-2"></i>Venue: <%= event.event_venue %>
+      </ul>
+      <ul class="postcard__tagbox">
+        <% if (new Date() >= new Date(event.event_date)) { %>
+            <i class="tag__item play blue fas fa-play mr-2"></i>Registration Closed
+          
         <% } else { %>
-          <a href="<%= event.event_url %>">Registration Link</a>
+          <li class="tag__item play blue">
+              <a href="<%= event.event_url %>"><i class="fas fa-play mr-2"></i>Register</a>
+      </li>
+          
         <% } %>
-      </td>
-        <td>
-          <img src="/images/<%= event.event_banner %>" alt="Event Banner" style="width: 100px; height: 100px;">
-        </td>
-        <% if (new Date().toLocaleDateString() === new Date(event.event_date).toLocaleDateString()){%>
-          <td>the event is today</td>
-            <% }else if(new Date() < new Date(event.event_date)){ %>
-              <td>The upcoming</td>
-              <% }else{ %>
-                <td>The event is ended</td>
-                <% } %>
-      </tr>
+      </ul>
+      <ul class="postcard__tagbox">
+        <i class="tag__item fas fa-clock mr-2"></i><%= event.admin_id %>
+      </ul>
+      <% if (new Date().toLocaleDateString() === new Date(event.event_date).toLocaleDateString()) { %>
+      <ul class="postcard__tagbox">
+        <i class="tag__item fas fa-clock mr-2"></i>Status: The Event is Today
+      </ul>
+      <% } else if (new Date() < new Date(event.event_date)) { %>
+      <ul class="postcard__tagbox">
+        <i class="tag__item fas fa-clock mr-2"></i>Status: Upcoming
+      </ul>
+      <% } else { %>
+      <ul class="postcard__tagbox">
+        <i class="tag__item fas fa-clock mr-2"></i>Status: Ended
+      </ul>
       <% } %>
-    </tbody>
-  </table>
+    </div>
+  </article>
+  <% } %>
+  
+
 <%- include("partials/footer.ejs") %>
