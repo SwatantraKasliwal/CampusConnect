@@ -1,5 +1,6 @@
-<!-- <%-include("partials/adminheader.ejs") %> -->
+ <%-include("partials/adminheader.ejs") %>
 
+<div class="admin-form">
 <h2>Enter the Event Details</h2>
 <form action="/adminform" method="post" enctype="multipart/form-data">
   <!-- adding a hidden adminID input so that it will be easy for us to access the admin id and push the data -->
@@ -10,9 +11,8 @@
   </div>
   <div>
     <label for="eventdetails">Event Details</label>
-    <textarea name="eventdetails" id="event-details">
-Enter the event Detail</textarea
-    >
+    <textarea name="eventdetails" id="event-details" placeholder="Enter the event details">
+</textarea>
   </div>
   <div>
     <label for="eventdate">Event Date</label>
@@ -36,5 +36,5 @@ Enter the event Detail</textarea
   </div>
   <button type="submit" class="btn btn-dark">Submit</button>
 </form>
-
+</div>
 <%-include("partials/footer.ejs") %>
