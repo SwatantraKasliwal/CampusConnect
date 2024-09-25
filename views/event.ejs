@@ -1,31 +1,49 @@
-<%- include("partials/header.ejs") %> <% for(let event of events){ %>
+<%- include("partials/header.ejs") %> 
+<% for (let event of events) {
+  const eventDate = new Date(event.event_date);
+  const currentDate = new Date();
+
+  // Compare event date with current date
+  if (eventDate >= currentDate) {
+%>
 <article class="postcard light blue">
-    <img
-      class="postcard__img"
-      src="/images/<%= event.event_banner %>"
-      alt="Image Title"
-    />
+  <img
+    class="postcard__img"
+    src="/images/<%= event.event_banner %>"
+    alt="Image Title"
+  />
   <div class="postcard__text t-dark">
-    <h1 class="postcard__title blue"><%=event.event_name%></h1>
+    <h1 class="postcard__title blue"><%= event.event_name %></h1>
     <div class="postcard__subtitle small">
       <time>
-        <i class="fas fa-calendar-alt mr-2"></i><%=new
-        Date(event.event_date).toLocaleDateString() %>,<%=event.event_time%>
+        <i class="fas fa-calendar-alt mr-2"></i
+        ><%= eventDate.toLocaleDateString() %>, <%= event.event_time %>
       </time>
     </div>
     <div class="postcard__bar"></div>
-    <div class="postcard__preview-txt"><%=event.event_details%></div>
+    <div class="postcard__preview-txt"><%= event.event_details %></div>
     <ul class="postcard__tagbox">
       <i class="tag__item fas fa-clock mr-2"></i
-      >Venue: <%=event.event_venue%>
+      >Venue: <%= event.event_venue %>
     </ul>
     <ul class="postcard__tagbox">
       <i class="tag__item fas fa-clock mr-2"></i
       ><%= event.admin_id %>
     </ul>
+    <% if (new Date().toLocaleDateString() === new Date(event.event_date).toLocaleDateString()) { %>
+      <ul class="postcard__tagbox">
+        <i class="tag__item fas fa-clock mr-2"></i>Status: The Event is Today
+      </ul>
+      <% } else if (new Date() < new Date(event.event_date)) { %>
+      <ul class="postcard__tagbox">
+        <i class="tag__item fas fa-clock mr-2"></i>Status: Upcoming
+      </ul>
+      <% } %>
   </div>
 </article>
-<% } %>
+<% } } %>
+
+
 <script>
   alert("To join the event please register or login");
 </script>

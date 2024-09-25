@@ -1,5 +1,10 @@
 <%- include("partials/studentheader.ejs")%> 
-<% for(let event of studentEvents) { %>
+<% for(let event of studentEvents) { 
+    const eventDate = new Date(event.event_date);
+  const currentDate = new Date();
+
+  // Compare event date with current date
+  if (eventDate >= currentDate) {%>
   <article class="postcard light blue">
     <img
       class="postcard__img"
@@ -40,12 +45,8 @@
       <ul class="postcard__tagbox">
         <i class="tag__item fas fa-clock mr-2"></i>Status: Upcoming
       </ul>
-      <% } else { %>
-      <ul class="postcard__tagbox">
-        <i class="tag__item fas fa-clock mr-2"></i>Status: Ended
-      </ul>
       <% } %>
     </div>
   </article>
-  <% } %>
+  <% }} %>
 <%- include("partials/footer.ejs") %>

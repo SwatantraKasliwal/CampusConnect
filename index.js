@@ -221,15 +221,13 @@ app.get("/studentlogin", (req, res) => {
   }
 });
 
-app.get(
-  "/auth/google",
+app.get("/auth/google",
   passport.authenticate("google", {
     scope: ["profile", "email"],
   })
 );
 
-app.get(
-  "/auth/google/callback",
+app.get("/auth/google/callback",
   passport.authenticate("google", {
     successRedirect: "/studentevent",
     failureRedirect: "/studentlogin",
@@ -370,8 +368,7 @@ app.post("/delete", async (req, res) => {
 });
 
 // creating the strategies
-passport.use(
-  "local",
+passport.use("local",
   new Strategy(async function verify(username, password, cb) {
     console.log(username, password);
     try {
@@ -394,8 +391,7 @@ passport.use(
   })
 );
 
-passport.use(
-  "student-local",
+passport.use("student-local",
   new Strategy(async function verify(username, password, cb) {
     console.log(username, password);
     try {
