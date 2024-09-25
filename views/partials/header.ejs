@@ -68,7 +68,7 @@
         font-weight: initial;
       }
       .dark {
-        background: #110f16;
+        background: #000000;
       }
 
       .light {
@@ -451,7 +451,7 @@
 
       /* Global Colors - The following color variables are used throughout the website. Updating them here will change the color scheme of the entire website */
       :root {
-        --background-color: #020202; /* Background color for the entire website, including individual sections */
+        --background-color: rgba(40, 40, 40, 1); /* Background color for the entire website, including individual sections */
         --default-color: #444444; /* Default color used for the majority of the text content across the entire website */
         --heading-color: #282828; /* Color for headings, subheadings and title throughout the website */
         --accent-color: #552ffd; /* Accent color that represents your brand on the website. It's used for buttons, links, and other elements that need to stand out */
@@ -658,7 +658,7 @@
 # Global Header
 --------------------------------------------------------------*/
       .header {
-        --background-color: rgba(0, 0, 0, 0);
+        --background-color: rgba(40, 40, 40, 0.9);
         --default-color: #ffffff;
         --heading-color: #ffffff;
         color: var(--default-color);
@@ -1050,7 +1050,7 @@
       .footer .copyright {
         padding-top: 25px;
         border-top: 1px solid
-          color-mix(in srgb, var(--default-color), transparent 90%);
+        color-mix(in srgb, var(--default-color), transparent 90%);
       }
 
       .footer .credits {
@@ -1064,7 +1064,175 @@
       .event{
         margin-top:5rem;
       }
-    
+
+      /* Admin Section */
+  .admin-login {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: rgba(40, 40, 40, 0.9);
+  flex-direction: column;
+}
+
+.admin-login form {
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+.admin-login .form-group {
+  margin-bottom: 20px;
+}
+
+.admin-login label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #552ffd;
+}
+
+.admin-login input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #dec1ff;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+.admin-login button {
+  width: 100%;
+  padding: 12px;
+  background-color: #552ffd;
+  color: #000000;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin: 5px;
+}
+
+.admin-login button:hover {
+  background-color: #dec1ff;
+}
+.admin-login h2{
+  color:#552ffd;
+}
+
+      /* Student login */
+.student-login {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding: 30px;
+  background-color: rgba(40, 40, 40, 0.9);
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.student-login .stl-1, .student-login .stl-2 {
+  width: 45%;
+  background-color: #ffffff;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.student-login h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #552ffd;
+}
+
+.student-login form {
+  display: flex;
+  flex-direction: column;
+}
+
+.student-login label {
+  margin-bottom: 8px;
+  font-weight: bold;
+  color:#552ffd;
+}
+
+.student-login input {
+  margin-bottom: 20px;
+  padding: 12px;
+  border: 1px solid #dec1ff;
+  border-radius: 5px;
+  width: 70%;
+}
+
+.student-login button {
+  padding: 12px;
+  background-color: #552ffd;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.student-login button:hover {
+  background-color: #dec1ff;
+}
+
+.student-login .card-body, .student-login div > a {
+  text-align: center;
+  margin-top: 25px;
+}
+
+.student-login a {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #4285f4;
+  color: #ffffff;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.student-login a:hover {
+  background-color: #357ae8;
+}
+.user-input{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+  .student-login {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .student-login .stl-1, .student-login .stl-2 {
+    width: 80%;
+  }
+}
+
+@media (max-width: 480px) {
+  .student-login .stl-1, .student-login .stl-2 {
+    width: 100%;
+    padding: 20px;
+  }
+
+  .student-login h2 {
+    font-size: 1.5em;
+  }
+
+  .student-login button {
+    padding: 10px;
+  }
+}
+
     </style>
   </head>
 

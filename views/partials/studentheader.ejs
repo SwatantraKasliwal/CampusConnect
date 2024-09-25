@@ -497,7 +497,7 @@
 
       /* Global Colors - The following color variables are used throughout the website. Updating them here will change the color scheme of the entire website */
       :root {
-        --background-color: #020202; /* Background color for the entire website, including individual sections */
+        --background-color: rgba(40, 40, 40, 0.9); /* Background color for the entire website, including individual sections */
         --default-color: #444444; /* Default color used for the majority of the text content across the entire website */
         --heading-color: #282828; /* Color for headings, subheadings and title throughout the website */
         --accent-color: #552ffd; /* Accent color that represents your brand on the website. It's used for buttons, links, and other elements that need to stand out */
@@ -704,7 +704,7 @@
 # Global Header
 --------------------------------------------------------------*/
       .header {
-        --background-color: rgba(0, 0, 0, 0);
+        --background-color: rgba(40, 40, 40, 0.9);
         --default-color: #ffffff;
         --heading-color: #ffffff;
         color: var(--default-color);
@@ -1131,10 +1131,10 @@
           <ul>
             <li><a href="/studentHome" class="active">Home</a></li>
             <li><a href="/studentevent">Events</a></li>
-            <li><a href="/logout">Logout</a></li>
           </ul>
           <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
         </nav>
+        <a class="cta-btn" href="/logout">Log Out</a>
       </div>
     </header>
     <div class="student-event"></div>
